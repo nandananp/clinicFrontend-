@@ -4,6 +4,12 @@ import 'package:go_router/go_router.dart';
 import '../../modules/auth/presentation/providers/auth_provider.dart';
 import '../../modules/auth/presentation/view/login_screen.dart';
 import '../../modules/auth/presentation/state/auth_state.dart';
+import '../../modules/dashboard/presentation/view/clinic_section_screen.dart';
+import '../../modules/dashboard/presentation/view/dashboard_screen.dart';
+import '../../modules/patients/presentation/view/patient_directory_screen.dart';
+import '../../modules/patients/presentation/view/patient_registration_screen.dart';
+import '../../modules/patients/domain/entities/patient_directory_entry.dart';
+import '../../modules/consultations/presentation/view/consultation_workspace_screen.dart';
 import 'app_pages.dart';
 
 /// GoRouter configuration with authentication guards.
@@ -17,7 +23,7 @@ import 'app_pages.dart';
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier<int>(0);
 
-  ref.listen<AuthState>(authNotifierProvider, (_, __) {
+  ref.listen<AuthState>(authNotifierProvider, (_, _) {
     refresh.value++;
   });
   ref.onDispose(refresh.dispose);
@@ -50,10 +56,47 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const LoginScreen(),
       ),
 
-      // ─── Dashboard (placeholder for Phase 2) ─────────────────
+      // ─── Dashboard ────────────────────────────────────────────
       GoRoute(
         path: AppPages.dashboard,
-        builder: (context, state) => const _DashboardPlaceholder(),
+        builder: (context, state) => const DashboardScreen(),
+      ),
+      GoRoute(
+        path: AppPages.patientRegister,
+        builder: (context, state) => const PatientRegistrationScreen(),
+      ),
+      GoRoute(
+        path: AppPages.patients,
+        builder: (context, state) => const PatientDirectoryScreen(),
+      ),
+      GoRoute(
+        path: AppPages.appointments,
+        builder: (context, state) =>
+            const ClinicSectionScreen(section: ClinicSection.appointments),
+      ),
+      GoRoute(
+        path: AppPages.patientConsultation,
+        builder: (context, state) => ConsultationWorkspaceScreen(
+          patientId: state.pathParameters['id']!,
+          patient: state.extra is PatientDirectoryEntry
+              ? state.extra! as PatientDirectoryEntry
+              : null,
+        ),
+      ),
+      GoRoute(
+        path: AppPages.medicines,
+        builder: (context, state) =>
+            const ClinicSectionScreen(section: ClinicSection.medicines),
+      ),
+      GoRoute(
+        path: AppPages.billing,
+        builder: (context, state) =>
+            const ClinicSectionScreen(section: ClinicSection.billing),
+      ),
+      GoRoute(
+        path: AppPages.settings,
+        builder: (context, state) =>
+            const ClinicSectionScreen(section: ClinicSection.settings),
       ),
     ],
     errorBuilder: (context, state) => const _NotFoundPage(),
@@ -61,118 +104,8 @@ final routerProvider = Provider<GoRouter>((ref) {
 });
 
 // ═══════════════════════════════════════════════════════════════════════
-// Temporary Placeholders — will be replaced in Phase 2
+// Shared route error view
 // ═══════════════════════════════════════════════════════════════════════
-
-/// Dashboard placeholder showing successful login confirmation.
-class _DashboardPlaceholder extends ConsumerWidget {
-  const _DashboardPlaceholder();
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final authState = ref.watch(authNotifierProvider);
-    final userName =
-        authState is AuthAuthenticated ? authState.user.fullName : 'Doctor';
-    final clinicName = authState is AuthAuthenticated
-        ? authState.user.clinicName ?? 'Clinic'
-        : 'Clinic';
-
-    return Scaffold(
-      backgroundColor: const Color(0xFFF5F7F9),
-      body: Center(
-        child: Container(
-          constraints: const BoxConstraints(maxWidth: 480),
-          padding: const EdgeInsets.all(40),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withAlpha(13),
-                blurRadius: 20,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Success icon
-              Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8F5F4),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: const Icon(
-                  Icons.check_circle_outline_rounded,
-                  size: 48,
-                  color: Color(0xFF369D96),
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Welcome text
-              Text(
-                'Welcome, $userName!',
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w600,
-                  color: Color(0xFF123D50),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 8),
-              Text(
-                clinicName,
-                style: const TextStyle(
-                  fontSize: 16,
-                  color: Color(0xFF369D96),
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Login successful! Dashboard coming in Phase 2.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Color(0xFF6B7B8D),
-                ),
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 32),
-
-              // Logout button
-              SizedBox(
-                width: double.infinity,
-                height: 48,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    ref.read(authNotifierProvider.notifier).logout();
-                  },
-                  icon: const Icon(Icons.logout_rounded, size: 20),
-                  label: const Text(
-                    'Logout',
-                    style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF369D96),
-                    foregroundColor: Colors.white,
-                    elevation: 0,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
 
 /// 404 page for unknown routes.
 class _NotFoundPage extends StatelessWidget {
@@ -210,10 +143,7 @@ class _NotFoundPage extends StatelessWidget {
             const SizedBox(height: 8),
             const Text(
               'The page you are looking for does not exist.',
-              style: TextStyle(
-                fontSize: 14,
-                color: Color(0xFF6B7B8D),
-              ),
+              style: TextStyle(fontSize: 14, color: Color(0xFF6B7B8D)),
             ),
             const SizedBox(height: 24),
             ElevatedButton.icon(
@@ -224,8 +154,10 @@ class _NotFoundPage extends StatelessWidget {
                 backgroundColor: const Color(0xFF369D96),
                 foregroundColor: Colors.white,
                 elevation: 0,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 14,
+                ),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(12),
                 ),

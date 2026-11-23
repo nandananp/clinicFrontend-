@@ -1,7 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../../core/api/api_client.dart';
-import '../../../../core/storage/token_storage.dart';
+import '../../../../core/api/api_providers.dart';
 
 import '../../data/datasources/auth_remote_datasource.dart';
 import '../../data/repositories/auth_repository_impl.dart';
@@ -10,18 +9,6 @@ import '../../domain/usecases/login_usecase.dart';
 import '../state/auth_state.dart';
 import '../../../../core/error/api_exception.dart';
 // ─── Dependency Providers ─────────────────────────────────────────────
-
-/// Provides the secure token storage instance.
-final tokenStorageProvider = Provider<TokenStorage>((ref) {
-  return TokenStorage();
-});
-
-/// Provides the centralized API client.
-final apiClientProvider = Provider<ApiClient>((ref) {
-  final tokenStorage = ref.watch(tokenStorageProvider);
-
-  return ApiClient(tokenStorage: tokenStorage);
-});
 
 /// Provides the actual authentication remote data source.
 final authRemoteDataSourceProvider = Provider<AuthRemoteDataSource>((ref) {
@@ -85,28 +72,23 @@ class AuthNotifier extends Notifier<AuthState> {
   /// Returns the final state ([AuthAuthenticated] or [AuthError]) so the
   /// View can show a toast right after the request finishes.
   Future<AuthState> login(String username, String password) async {
-  state = const AuthLoading();
+    state = const AuthLoading();
 
-  try {
-    final result = await _loginUseCase.execute(
-      username,
-      password,
-    );
+    try {
+      final result = await _loginUseCase.execute(username, password);
 
-    state = AuthAuthenticated(
-      user: result.user,
-      message: result.message,
-    );
-  } catch (e) {
-    final message = e is ApiException
-        ? e.message
-        : e.toString().replaceAll('Exception: ', '');
+      state = AuthAuthenticated(user: result.user, message: result.message);
+    } catch (e) {
+      final message = e is ApiException
+          ? e.message
+          : e.toString().replaceAll('Exception: ', '');
 
-    state = AuthError(message: message);
+      state = AuthError(message: message);
+    }
+
+    return state;
   }
 
-  return state;
-}
   /// Logs out the current user.
   Future<void> logout() async {
     try {

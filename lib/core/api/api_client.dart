@@ -1,4 +1,3 @@
-
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -13,14 +12,16 @@ class ApiClient {
   final TokenStorage _tokenStorage;
 
   ApiClient({required TokenStorage tokenStorage})
-      : _tokenStorage = tokenStorage {
+    : _tokenStorage = tokenStorage {
     _dio = Dio(
       BaseOptions(
         baseUrl: dotenv.env['API_BASE_URL'] ?? 'http://localhost:8080/v1',
-        connectTimeout:
-            const Duration(milliseconds: AppConstants.connectionTimeout),
-        receiveTimeout:
-            const Duration(milliseconds: AppConstants.receiveTimeout),
+        connectTimeout: const Duration(
+          milliseconds: AppConstants.connectionTimeout,
+        ),
+        receiveTimeout: const Duration(
+          milliseconds: AppConstants.receiveTimeout,
+        ),
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
@@ -28,10 +29,7 @@ class ApiClient {
       ),
     );
 
-    _dio.interceptors.addAll([
-      _authInterceptor(),
-      _logInterceptor(),
-    ]);
+    _dio.interceptors.addAll([_authInterceptor(), _logInterceptor()]);
   }
 
   /// Adds the Bearer token to every outgoing request.
@@ -57,12 +55,12 @@ class ApiClient {
     );
   }
 
-  /// Logs request/response bodies for debugging.
+  /// Logs request metadata only; patient data must never be written to logs.
   LogInterceptor _logInterceptor() {
     return LogInterceptor(
-      requestBody: true,
-      responseBody: true,
-      error: true,
+      requestBody: false,
+      responseBody: false,
+      error: false,
       requestHeader: false,
       responseHeader: false,
     );

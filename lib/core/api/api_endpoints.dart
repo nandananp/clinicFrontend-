@@ -11,22 +11,27 @@ class ApiEndpoints {
   static const String myClinics = '/me/clinics';
 
   // ─── Patients ─────────────────────────────────────────────────────
+  static const String registerPatient = '/doctor/register/patient';
+  static const String doctorProfile = '/doctor/profile';
   static const String patients = '/patients';
   static String patientById(String id) => '/patients/$id';
   static String patientAllergies(String id) => '/patients/$id/allergies';
   static String patientConditions(String id) => '/patients/$id/conditions';
-  static String patientConsultations(String id) => '/patients/$id/consultations';
+  static String patientConsultations(String id) =>
+      '/patients/$id/consultations';
 
   // ─── Consultations ────────────────────────────────────────────────
   static const String consultations = '/consultations';
   static String consultationById(String id) => '/consultations/$id';
-  static String finalizeConsultation(String id) => '/consultations/$id/finalize';
+  static String finalizeConsultation(String id) =>
+      '/consultations/$id/finalize';
 
   // ─── Prescriptions ────────────────────────────────────────────────
   static String prescriptionsForConsultation(String consultationId) =>
       '/consultations/$consultationId/prescriptions';
   static String prescriptionById(String id) => '/prescriptions/$id';
-  static String finalizePrescription(String id) => '/prescriptions/$id/finalize';
+  static String finalizePrescription(String id) =>
+      '/prescriptions/$id/finalize';
   static String amendPrescription(String id) => '/prescriptions/$id/amendments';
 
   // ─── Appointments ─────────────────────────────────────────────────

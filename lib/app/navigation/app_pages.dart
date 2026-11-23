@@ -13,26 +13,18 @@ class AppPages {
   static const String patients = '/dashboard/patients';
   static const String patientRegister = '/dashboard/patients/register';
   static const String patientEdit = '/dashboard/patients/edit/:id';
-  static const String patientDetails = '/dashboard/patients/:id';
+  static const String patientConsultation =
+      '/dashboard/patients/:id/consultation';
+  static String consultationForPatient(String id) =>
+      '/dashboard/patients/$id/consultation';
 
   // ─── Appointments ─────────────────────────────────────────────────
   static const String appointments = '/dashboard/appointments';
 
-  // ─── Consultations ────────────────────────────────────────────────
-  static const String consultations = '/dashboard/consultations';
-  static const String newConsultation = '/dashboard/consultations/new';
-
-  // ─── Prescriptions ────────────────────────────────────────────────
-  static const String prescriptions = '/dashboard/prescriptions';
-  static const String newPrescription = '/dashboard/prescriptions/new';
-
-  // ─── Medical Records ──────────────────────────────────────────────
-  static const String medicalRecords = '/dashboard/medical-records';
-
   // ─── Medicines ────────────────────────────────────────────────────
   static const String medicines = '/dashboard/medicines';
 
-  // ─── Profile & Settings ───────────────────────────────────────────
-  static const String profile = '/dashboard/profile';
+  // ─── Billing & Settings ───────────────────────────────────────────
+  static const String billing = '/dashboard/billing';
   static const String settings = '/dashboard/settings';
 }
